@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Juego de Nave - Flash Alternativo</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: black;
+        }
+        canvas {
+            display: block;
+            margin: 0 auto;
+            background-color: #000;
+            border: 2px solid white;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="gameCanvas"></canvas>
+    
+    <script>
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+
+        // Tamaño del canvas
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        // Nave
+        const spaceship = {
+            x: canvas.width / 2,
+            y: canvas.height - 50,
+            width: 50,
+            height: 50,
+            speed: 5,
+            dx: 0
+        };
+
+        // Disparos
+        const bullets = [];
+        const bulletSpeed = 5;
+
+        // Teclas presionadas
+        const keys = {
+            left: false,
+            right: false,
+            space: false
+        };
+
+        // Manejadores de eventos de teclas
+        window.addEventListener("keydown", (e) => {
+            if (e.key === "ArrowLeft") keys.left = true;
+            if (e.key === "ArrowRight") keys.right = true;
+            if (e.key === " ") keys.space = true;
+        });
+
+        window.addEventListener("keyup", (e) => {
+            if (e.key === "ArrowLeft") keys.left = false;
+            if (e.key === "ArrowRight") keys.right = false;
+            if (e.key === " ") keys.space = false;
+        });
+
+        // Movimiento de la nave
+        function moveSpaceship() {
+            if (keys.left && spaceship.x > 0) spaceship.x -= spaceship.speed;
+            if (keys.right && spaceship.x < canvas.width - spaceship.width) spaceship.x += spaceship.speed;
+        }
+
+        // Disparo de balas
+        function shootBullet() {
+            if (keys.space) {
+                bullets.push({ x: spaceship.x + spaceship.width / 2 - 2, y: spaceship.y, width: 5, height: 10 });
+            }
+        }
+
+        // Actualizar las balas
+        function updateBullets() {
+            for (let i = 0; i < bullets.length; i++) {
+                bullets[i].y -= bulletSpeed;
+                if (bullets[i].y < 0) {
+                    bullets.splice(i, 1);
+                    i--;
+                }
+            }
+        }
+
+        // Dibujar la nave
+        function drawSpaceship() {
+            ctx.fillStyle = "white";
+            ctx.fillRect(spaceship.x, spaceship.y, spaceship.width, spaceship.height);
+        }
+
+        // Dibujar las balas
+        function drawBullets() {
+            ctx.fillStyle = "red";
+            for (let i = 0; i < bullets.length; i++) {
+                ctx.fillRect(bullets[i].x, bullets[i].y, bullets[i].width, bullets[i].height);
+            }
+        }
+
+        // Bucle del juego
+        function gameLoop() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height); // Limpiar el canvas
+
+            moveSpaceship();
+            shootBullet();
+            updateBullets();
+            
+            drawSpaceship();
+            drawBullets();
+
+            requestAnimationFrame(gameLoop); // Continuar con el siguiente fotograma
+        }
+
+        // Iniciar el juego
+        gameLoop();
+    </script>
+</body>
+</html>
